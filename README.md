@@ -1,10 +1,12 @@
 # Pygame typing speed test
 
 My first pet project. Helps for every-day typing 
-training practice. Despite it's primitive, it still can be 
-useful, and contains some ideas, that will be used in my 
+training practice.  
+Despite it's primitive, it still can be useful.  
+It contains some ideas, that will be used in my 
 another project with more powerful and suitable tools 
-than pygame. Based on pygame's package textinput file example. 
+than pygame.  
+Based on pygame's package textinput file example. 
 
 ## How to use
 
