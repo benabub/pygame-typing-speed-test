@@ -19,7 +19,7 @@ the package directory of the project.
 
 ## Design solution
 
-I was inspired by electriсal grill Tefal for the design of this project.  
+I was inspired by the electriсal grill Tefal for the design of this project.  
 It has display indicator, that smoothly changes its color during cooking, depending on time.  
 That's how the result looks like: 
 - Start:
