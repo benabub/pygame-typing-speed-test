@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "pygame-typing-speed-test"
+version = "0.1.0"
+description = "Test how fast you'll type 2000 symbols of text"
+authors = ["Benedict Abub <dfgertwer@proton.me>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+pygame = "^2.6.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
