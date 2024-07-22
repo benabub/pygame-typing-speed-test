@@ -6,7 +6,7 @@ Despite it's primitive, it still can be useful.
 It contains some ideas, that will be used in my 
 another project with more powerful and suitable tools 
 than pygame.  
-Based on pygame's package textinput file example. 
+Based on pygame's package textinput example file. 
 
 ## How to use
 
