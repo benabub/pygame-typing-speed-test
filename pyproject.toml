@@ -2,7 +2,7 @@
 name = "pygame-typing-speed-test"
 version = "0.1.0"
 description = "Test how fast you'll type 2000 symbols of text"
-authors = ["Benedict Abub <dfgertwer@proton.me>"]
+authors = ["Benedict Abub <fkhurkhd2123dfs@tutamail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
