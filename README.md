@@ -1,10 +1,12 @@
 # Pygame typing speed test
 
 My first pet project. Helps for every-day typing 
-training practice. Despite it's primitive, it still can be 
-useful, and contains some ideas, that will be used in my 
+training practice.  
+Despite it's primitive, it still can be useful.  
+It contains some ideas, that will be used in my 
 another project with more powerful and suitable tools 
-than pygame. Based on pygame's package textinput file example. 
+than pygame.  
+Based on pygame's package textinput example file. 
 
 ## How to use
 
@@ -19,7 +21,7 @@ the package directory of the project.
 
 ## Design solution
 
-I was inspired by electriсal grill Tefal for the design of this project.  
+I was inspired by the electriсal grill Tefal for the design of this project.  
 It has display indicator, that smoothly changes its color during cooking, depending on time.  
 That's how the result looks like: 
 - Start:
