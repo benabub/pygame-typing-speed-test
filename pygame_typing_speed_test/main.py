@@ -4,6 +4,7 @@ import os
 import pygame as pg
 import pygame.freetype as freetype
 
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
 pg.init()
 
 # required symbols quantity
@@ -19,8 +20,8 @@ DISPLAY_WIDTH = pg.display.Info().current_w
 DISPLAY_HEIGHT = pg.display.Info().current_h
 WINDOW_WIDTH = DISPLAY_WIDTH * 1
 WINDOW_HEIGHT = DISPLAY_HEIGHT * .2
-os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % (int(round(DISPLAY_WIDTH * .328)),
-                                                int(round(DISPLAY_WIDTH * .7)))
+os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % (
+    int(round(DISPLAY_WIDTH * .328)), int(round(DISPLAY_WIDTH * .7)))
 scope_base = int(round(WINDOW_WIDTH ** .605 - 27))
 pg.display.set_caption("Typing speed test")
 screen = pg.display.set_mode([WINDOW_WIDTH, WINDOW_HEIGHT])
@@ -38,14 +39,16 @@ FONT_SIZE_HEAD = int(round(scope_base * .9))
 FONT_SIZE_LIST = scope_base
 
 # text positioning
-DRIFT_TYPPING = int(round(scope_base * 2.3))  # x center position of typing zone from center to left
-DRIFT_COUNTER = int(round(scope_base * 2.7))  # x center position of SYMBOLS_QUANTITY from left border to center
+# x center position of typing zone from center to left
+DRIFT_TYPPING = int(round(scope_base * 2.3))
+# x center position of SYMBOLS_QUANTITY from left border to center
+DRIFT_COUNTER = int(round(scope_base * 2.7))
 RECT_HIGH = int(round(scope_base * 1.2))
 TEXT_HIGH = int(round(scope_base * 1.5))
 
 # sound
 pg.mixer.init()
-sound1 = pg.mixer.Sound('start count 3 sec.mp3')
+sound1 = pg.mixer.Sound("start-count-3-sec.mp3")
 sound1.set_volume(0.1)
 sound2 = pg.mixer.Sound('stop.mp3')
 sound2.set_volume(0.5)
@@ -177,7 +180,8 @@ class Secundomer:
         self.font = pg.font.SysFont(FONT_NAME_HEAD, FONT_SIZE_HEAD)
 
     def run(self):
-        timer_sec = round((pg.time.get_ticks() - self.start) / 1000) - self.delay
+        timer_sec = round(
+            (pg.time.get_ticks() - self.start) / 1000) - self.delay
         minutes = int(timer_sec / 60)
         seconds = timer_sec - (minutes * 60)
         secundomer = f"{minutes} : {seconds}"
@@ -226,8 +230,10 @@ class TextInput:
         self.prompt = prompt  # sign '>'
         self.print_event = print_event  # bool
         # position of chatlist and chatbox
-        self.CHAT_LIST_POS = pg.Rect((pos[0] - 20, pos[1]), (WINDOW_WIDTH / 2 - DRIFT_TYPPING, 40))
-        self.CHAT_BOX_POS = pg.Rect((pos[0], pos[1] + 3), (screen_dimensions[1], 40))
+        self.CHAT_LIST_POS = pg.Rect(
+            (pos[0] - 20, pos[1]), (WINDOW_WIDTH / 2 - DRIFT_TYPPING, 40))
+        self.CHAT_BOX_POS = pg.Rect(
+            (pos[0], pos[1] + 3), (screen_dimensions[1], 40))
 
         # pos = (x, y) - input coodinates
         self.pos_0 = pos[0]
@@ -280,18 +286,19 @@ class TextInput:
                 if event.key == pg.K_BACKSPACE:
                     if len(self.chat_box_text) > 0 and self.chat_box_text_pos > 0:
                         self.chat_box_text = (
-                                self.chat_box_text[0: self.chat_box_text_pos - 1]
-                                + self.chat_box_text[self.chat_box_text_pos:]
+                            self.chat_box_text[0: self.chat_box_text_pos - 1]
+                            + self.chat_box_text[self.chat_box_text_pos:]
                         )
-                        self.chat_box_text_pos = max(0, self.chat_box_text_pos - 1)
+                        self.chat_box_text_pos = max(
+                            0, self.chat_box_text_pos - 1)
                         self.counter -= 1
 
                 elif event.key == pg.K_DELETE:
                     if self.chat_box_text_pos < len(self.chat_box_text):
                         self.counter -= 1
                     self.chat_box_text = (
-                            self.chat_box_text[0: self.chat_box_text_pos]
-                            + self.chat_box_text[self.chat_box_text_pos + 1:]
+                        self.chat_box_text[0: self.chat_box_text_pos]
+                        + self.chat_box_text[self.chat_box_text_pos + 1:]
                     )
 
                 elif event.key == pg.K_LEFT:
@@ -327,9 +334,9 @@ class TextInput:
                 self.chat_box_editing = False
                 self.chat_box_editing_text = ""
                 self.chat_box_text = (
-                        self.chat_box_text[0: self.chat_box_text_pos]
-                        + event.text
-                        + self.chat_box_text[self.chat_box_text_pos:]
+                    self.chat_box_text[0: self.chat_box_text_pos]
+                    + event.text
+                    + self.chat_box_text[self.chat_box_text_pos:]
                 )
                 self.chat_box_text_pos += len(event.text)
 
@@ -340,7 +347,8 @@ class TextInput:
 
         rect_list_string = self.font.render_to(
             surf=screen_2,
-            dest=(self.CHAT_LIST_POS.x - (15 + self.width_list_string), self.CHAT_LIST_POS.y),
+            dest=(self.CHAT_LIST_POS.x -
+                  (15 + self.width_list_string), self.CHAT_LIST_POS.y),
             text=self.list_string,
             fgcolor=self.text_list_color,
         )
@@ -350,11 +358,12 @@ class TextInput:
             self.list_string = self.list_string[5:]
 
         start_pos = self.CHAT_BOX_POS.copy()
-        ime_text_l = self.prompt + self.chat_box_text[0: self.chat_box_text_pos]
+        ime_text_l = self.prompt + \
+            self.chat_box_text[0: self.chat_box_text_pos]
         ime_text_m = (
-                self.chat_box_editing_text[0: self.chat_box_editing_pos]
-                + "|"
-                + self.chat_box_editing_text[self.chat_box_editing_pos:]
+            self.chat_box_editing_text[0: self.chat_box_editing_pos]
+            + "|"
+            + self.chat_box_editing_text[self.chat_box_editing_pos:]
         )
         ime_text_r = self.chat_box_text[self.chat_box_text_pos:]
 
@@ -410,7 +419,8 @@ def wait(timer, delay=TIME_DELAY):
     if timer > 1420 + d * 3:
         warning = "4.."
 
-    text = pg.font.SysFont(FONT_NAME_HEAD, FONT_SIZE_HEAD).render(warning, True, HEAD_TEXT_COLOR)
+    text = pg.font.SysFont(FONT_NAME_HEAD, FONT_SIZE_HEAD).render(
+        warning, True, HEAD_TEXT_COLOR)
     text_rect = text.get_rect()
     text_rect.centerx = screen.get_rect().centerx
     text_rect.y = int(round(scope_base * .13))
@@ -421,8 +431,8 @@ def wait(timer, delay=TIME_DELAY):
 def greet():
     head_rect_color((150, 150, 150))
     greeting = "Press Enter/SPACE"
-    text = pg.font.SysFont(FONT_NAME_HEAD, FONT_SIZE_HEAD).render(greeting,
-                                                                  True, HEAD_TEXT_COLOR)
+    text = pg.font.SysFont(FONT_NAME_HEAD, FONT_SIZE_HEAD).render(
+        greeting, True, HEAD_TEXT_COLOR)
     text_rect = text.get_rect()
     text_rect.centerx = screen.get_rect().centerx
     text_rect.y = int(round(scope_base * .13))
@@ -441,7 +451,8 @@ class Game:
         self.WINDOW_HEIGHT = WINDOW_HEIGHT
         self.FPS = FPS
         self.BG_COLOR = BG_COLOR
-        self.screen = pg.display.set_mode((self.WINDOW_WIDTH, self.WINDOW_HEIGHT))
+        self.screen = pg.display.set_mode(
+            (self.WINDOW_WIDTH, self.WINDOW_HEIGHT))
         self.clock = pg.time.Clock()
 
         # Text input
@@ -491,7 +502,8 @@ class Game:
             elif self.get_ready:
                 head_rect_color((150, 150, 150))
                 wait(pg.time.get_ticks() - time_start)
-                time_from_enter = round((pg.time.get_ticks() - time_start) / 1000)
+                time_from_enter = round(
+                    (pg.time.get_ticks() - time_start) / 1000)
                 if time_from_enter >= TIME_DELAY:
                     self.get_ready = False
                     self.tapping_start = True
