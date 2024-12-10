@@ -4,7 +4,6 @@ import os
 import pygame as pg
 import pygame.freetype as freetype
 
-os.chdir(os.path.dirname(os.path.abspath(__file__)))
 pg.init()
 
 # required symbols quantity
