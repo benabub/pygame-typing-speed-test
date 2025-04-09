@@ -15,15 +15,27 @@ FPS = 50
 TIME_DELAY = 5
 
 # window
-DISPLAY_WIDTH = pg.display.Info().current_w
-DISPLAY_HEIGHT = pg.display.Info().current_h
-WINDOW_WIDTH = DISPLAY_WIDTH * 1
-WINDOW_HEIGHT = DISPLAY_HEIGHT * .2
-os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % (
-    int(round(DISPLAY_WIDTH * .328)), int(round(DISPLAY_WIDTH * .7)))
-scope_base = int(round(WINDOW_WIDTH ** .605 - 27))
-pg.display.set_caption("Typing speed test")
-screen = pg.display.set_mode([WINDOW_WIDTH, WINDOW_HEIGHT])
+is_wayland = ("WAYLAND_DISPLAY" in os.environ or
+              "HYPRLAND_INSTANCE_SIGNATURE" in os.environ)
+
+if is_wayland:
+    DISPLAY_WIDTH = 1920
+    DISPLAY_HEIGHT = 1080
+    WINDOW_WIDTH = DISPLAY_WIDTH * .9
+    WINDOW_HEIGHT = int(DISPLAY_HEIGHT * 0.2)
+    os.environ['SDL_VIDEO_DRIVER'] = 'wayland'
+    screen = pg.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT), pg.NOFRAME)
+    scope_base = int(round(WINDOW_WIDTH ** .605 - 27))
+else:
+    DISPLAY_WIDTH = pg.display.Info().current_w
+    DISPLAY_HEIGHT = pg.display.Info().current_h
+    WINDOW_WIDTH = DISPLAY_WIDTH * 1
+    WINDOW_HEIGHT = DISPLAY_HEIGHT * .2
+    os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % (
+        int(round(DISPLAY_WIDTH * .328)), int(round(DISPLAY_WIDTH * .7)))
+    scope_base = int(round(WINDOW_WIDTH ** .605 - 27))
+    pg.display.set_caption("Typing speed test")
+    screen = pg.display.set_mode([WINDOW_WIDTH, WINDOW_HEIGHT])
 
 # colors
 BG_COLOR = (255, 255, 255)
