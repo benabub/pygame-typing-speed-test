@@ -1,8 +1,11 @@
 import sys
 import os
+from pathlib import Path
 
 import pygame as pg
 import pygame.freetype as freetype
+
+project_dir = Path(__file__).parent.resolve()
 
 pg.init()
 
@@ -59,9 +62,9 @@ TEXT_HIGH = int(round(scope_base * 1.5))
 
 # sound
 pg.mixer.init()
-sound1 = pg.mixer.Sound("start-count-3-sec.mp3")
+sound1 = pg.mixer.Sound(project_dir / "start-count-3-sec.mp3")
 sound1.set_volume(0.1)
-sound2 = pg.mixer.Sound('stop.mp3')
+sound2 = pg.mixer.Sound(project_dir / 'stop.mp3')
 sound2.set_volume(0.5)
 
 
@@ -552,11 +555,6 @@ class Game:
                     sound2.play()
 
 
-# Main loop process
-def main():
+if __name__ == '__main__':
     game = Game()
     game.main_loop()
-
-
-if __name__ == '__main__':
-    main()
