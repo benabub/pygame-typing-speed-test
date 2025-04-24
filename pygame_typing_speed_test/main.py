@@ -61,7 +61,6 @@ RECT_HIGH = int(round(scope_base * 1.2))
 TEXT_HIGH = int(round(scope_base * 1.5))
 
 # sound
-pg.mixer.init()
 sound1 = pg.mixer.Sound(project_dir / "start-count-3-sec.mp3")
 sound1.set_volume(0.1)
 sound2 = pg.mixer.Sound(project_dir / 'stop.mp3')
@@ -501,6 +500,7 @@ class Game:
                 if event.type == pg.QUIT:
                     pg.quit()
                     return
+
             # Greeting
             if self.greeting:
                 greet()
@@ -546,13 +546,14 @@ class Game:
                 )
                 self.counter.run()
 
-                pg.display.update()
-                self.clock.tick(self.FPS)
-
                 if self.text_input.counter >= SYMBOLS_QUANTITY:
                     self.tapping_start = False
                     self.tapping_stop = True
                     sound2.play()
+
+            # after that line, music files sounds unnaturally:
+            self.clock.tick(self.FPS)
+            pg.display.update()
 
 
 if __name__ == '__main__':
