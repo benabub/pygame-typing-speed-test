@@ -13,7 +13,7 @@ pg.init()
 SYMBOLS_QUANTITY = 2000
 
 # frames per second, the general speed of the program
-FPS = 50
+FPS = 60
 # reverse start timer
 TIME_DELAY = 5
 
@@ -297,7 +297,8 @@ class TextInput:
                     continue
 
                 if event.key == pg.K_BACKSPACE:
-                    if len(self.chat_box_text) > 0 and self.chat_box_text_pos > 0:
+                    if (len(self.chat_box_text) > 0 and
+                            self.chat_box_text_pos > 0):
                         self.chat_box_text = (
                             self.chat_box_text[0: self.chat_box_text_pos - 1]
                             + self.chat_box_text[self.chat_box_text_pos:]
@@ -411,34 +412,44 @@ def head_rect_color(color):
     )
 
 
-def wait(timer, delay=TIME_DELAY):
-    """ Time count-down before tapping biggins function
+class WaitTimer:
+    """Класс для управления таймером ожидания и воспроизведения звука."""
 
-            :param timer: msec time wait period from 0 to (delay * 1000);
-            :param delay: length of "wait" function
-            :return: None
-            """
-    head_rect_color(color_bg_wait_mix(timer, delay))
-    warning = "get ready..."
-    if timer > 1362:
-        sound1.play()
-    d = 800
-    if timer > 1400:
-        warning = "1.."
-    if timer > 1400 + d:
-        warning = "2.."
-    if timer > 1410 + d * 2:
-        warning = "3.."
-    if timer > 1420 + d * 3:
-        warning = "4.."
+    def __init__(self):
+        self.sound1_played = False
 
-    text = pg.font.SysFont(FONT_NAME_HEAD, FONT_SIZE_HEAD).render(
-        warning, True, HEAD_TEXT_COLOR)
-    text_rect = text.get_rect()
-    text_rect.centerx = screen.get_rect().centerx
-    text_rect.y = int(round(scope_base * .13))
-    screen.blit(text, text_rect)
-    pg.display.update()
+    def wait(self, timer, delay=TIME_DELAY):
+        """Отсчет времени перед началом ввода текста.
+
+        :param timer: время в мс от 0 до (delay * 1000)
+        :param delay: длительность ожидания
+        :return: None
+        """
+        head_rect_color(color_bg_wait_mix(timer, delay))
+        warning = "get ready..."
+
+        if timer > 1362 and not self.sound1_played:
+            print("Playing sound1")
+            sound1.play()
+            self.sound1_played = True
+
+        d = 800
+        if timer > 1400:
+            warning = "1.."
+        if timer > 1400 + d:
+            warning = "2.."
+        if timer > 1410 + d * 2:
+            warning = "3.."
+        if timer > 1420 + d * 3:
+            warning = "4.."
+
+        text = pg.font.SysFont(FONT_NAME_HEAD, FONT_SIZE_HEAD).render(
+            warning, True, HEAD_TEXT_COLOR)
+        text_rect = text.get_rect()
+        text_rect.centerx = screen.get_rect().centerx
+        text_rect.y = int(round(scope_base * .13))
+        screen.blit(text, text_rect)
+        pg.display.update()
 
 
 def greet():
@@ -484,6 +495,7 @@ class Game:
         self.get_ready = False
         self.tapping_start = False
         self.tapping_stop = False
+        self.wait_timer = WaitTimer()
 
     def main_loop(self) -> None:
         pg.key.start_text_input()
@@ -515,7 +527,7 @@ class Game:
             # countdown
             elif self.get_ready:
                 head_rect_color((150, 150, 150))
-                wait(pg.time.get_ticks() - time_start)
+                self.wait_timer.wait(pg.time.get_ticks() - time_start)
                 time_from_enter = round(
                     (pg.time.get_ticks() - time_start) / 1000)
                 if time_from_enter >= TIME_DELAY:
@@ -551,7 +563,6 @@ class Game:
                     self.tapping_stop = True
                     sound2.play()
 
-            # after that line, music files sounds unnaturally:
             self.clock.tick(self.FPS)
             pg.display.update()
 
