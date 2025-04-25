@@ -554,7 +554,9 @@ class Game:
 
             # Greeting
             if self.greeting:
-                greet()
+                if not hasattr(self, '_greet_cached'):
+                    greet()
+                    self._greet_cached = True
                 for event in events:
                     if event.type == pg.KEYDOWN:
                         if event.key == 13 or event.key == pg.K_SPACE:
