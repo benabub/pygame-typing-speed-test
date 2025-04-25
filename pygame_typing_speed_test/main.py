@@ -9,15 +9,15 @@ project_dir = Path(__file__).parent.resolve()
 
 pg.init()
 
-# required symbols quantity
+# Required symbols quantity
 SYMBOLS_QUANTITY = 2000
 
-# frames per second, the general speed of the program
+# Frames per second, the general speed of the program
 FPS = 60
-# reverse start timer
+# Reverse start timer
 TIME_DELAY = 5
 
-# window
+# Window
 is_wayland = ("WAYLAND_DISPLAY" in os.environ or
               "HYPRLAND_INSTANCE_SIGNATURE" in os.environ)
 
@@ -40,19 +40,19 @@ else:
     pg.display.set_caption("Typing speed test")
     screen = pg.display.set_mode([WINDOW_WIDTH, WINDOW_HEIGHT])
 
-# colors
+# Colors
 BG_COLOR = (255, 255, 255)
 TEXT_COLOR = (0, 0, 0)
 TEXT_LIST_COLOR = (100, 100, 100)
 HEAD_TEXT_COLOR = (255, 255, 255)
 
-# fonts
+# Fonts
 FONT_NAME_LIST = ["Calibri"]
 FONT_NAME_HEAD = ["Calibri"]
 FONT_SIZE_HEAD = int(round(scope_base * .9))
 FONT_SIZE_LIST = scope_base
 
-# text positioning
+# Text positioning
 # x center position of typing zone from center to left
 DRIFT_TYPPING = int(round(scope_base * 2.3))
 # x center position of SYMBOLS_QUANTITY from left border to center
@@ -60,7 +60,7 @@ DRIFT_COUNTER = int(round(scope_base * 2.7))
 RECT_HIGH = int(round(scope_base * 1.2))
 TEXT_HIGH = int(round(scope_base * 1.5))
 
-# sound
+# Sound
 sound1 = pg.mixer.Sound(project_dir / "start-count-3-sec.mp3")
 sound1.set_volume(0.1)
 sound2 = pg.mixer.Sound(project_dir / 'stop.mp3')
@@ -189,12 +189,38 @@ class Secundomer:
         self.y = y
         self.delay = delay
         self.start = start
+        self.paused = False
+        self.pause_start = 0
+        self.total_pause_time = 0
         self.color = color
         self.font = pg.font.SysFont(FONT_NAME_HEAD, FONT_SIZE_HEAD)
 
     def run(self):
-        timer_sec = round(
-            (pg.time.get_ticks() - self.start) / 1000) - self.delay
+        if self.paused:
+            if not self.pause_start:
+                self.pause_start = pg.time.get_ticks()
+                self.paused_timer_sec = (
+                    (round((self.pause_start - self.start -
+                     self.total_pause_time) / 1000) - self.delay))
+            minutes = int(self.paused_timer_sec / 60)
+            seconds = self.paused_timer_sec - (minutes * 60)
+            secundomer = f"{minutes} : {seconds}"
+            text = self.font.render(secundomer, True, self.color)
+            text_rect = text.get_rect()
+            text_rect.centerx = screen.get_rect().centerx
+            text_rect.y = self.y
+            screen.blit(text, text_rect)
+            return
+
+        if self.pause_start and not self.paused:
+            pause_duration = pg.time.get_ticks() - self.pause_start
+            self.total_pause_time += pause_duration
+            self.pause_start = 0
+
+        current_time = pg.time.get_ticks()
+        elapsed_time = current_time - self.start - self.total_pause_time
+        timer_sec = round(elapsed_time / 1000) - self.delay
+
         minutes = int(timer_sec / 60)
         seconds = timer_sec - (minutes * 60)
         secundomer = f"{minutes} : {seconds}"
@@ -237,8 +263,9 @@ class TextInput:
     def __init__(
             self, prompt: str, pos, screen_dimensions,
             print_event: bool, text_color=TEXT_COLOR,
-            text_list_color=TEXT_LIST_COLOR
+            text_list_color=TEXT_LIST_COLOR, paused=False
     ) -> None:
+        self.paused = paused
         self.FONT_NAME_LIST = FONT_NAME_LIST
         self.prompt = prompt  # sign '>'
         self.print_event = print_event  # bool
@@ -270,6 +297,9 @@ class TextInput:
         """
         Updates the text input widget
         """
+        if self.paused:
+            return
+
         for event in events:
             if event.type == pg.KEYDOWN:
                 if event.key not in {pg.K_SPACE, pg.K_RIGHT, pg.K_LEFT,
@@ -317,7 +347,6 @@ class TextInput:
 
                 elif event.key == pg.K_LEFT:
                     self.chat_box_text_pos = max(0, self.chat_box_text_pos - 1)
-                    # self.counter -= 1
                 elif event.key == pg.K_RIGHT:
                     self.chat_box_text_pos = min(
                         len(self.chat_box_text), self.chat_box_text_pos + 1
@@ -480,7 +509,7 @@ class Game:
         self.clock = pg.time.Clock()
 
         # Text input
-        # Set to true or add 'showevent' in argv to see IME and KEYDOWN events
+        # set to true or add 'showevent' in argv to see IME and KEYDOWN events
         self.print_event = "showevent" in sys.argv
         self.text_input = TextInput(
             prompt="> ",
@@ -506,12 +535,22 @@ class Game:
         time_start = 0
         running = True
 
+        secundomer = Secundomer(
+            y=int(round(scope_base * .13)),
+            delay=TIME_DELAY,
+            start=time_start,
+            color=color_text_mix(self.text_input.counter)
+        )
+
         while running:
             events = pg.event.get()
             for event in events:
                 if event.type == pg.QUIT:
                     pg.quit()
                     return
+                if event.type == pg.KEYDOWN and event.key == pg.K_PAUSE:
+                    self.text_input.paused = not self.text_input.paused
+                    secundomer.paused = self.text_input.paused
 
             # Greeting
             if self.greeting:
@@ -520,7 +559,9 @@ class Game:
                     if event.type == pg.KEYDOWN:
                         if event.key == 13 or event.key == pg.K_SPACE:
                             time_start = pg.time.get_ticks()
-                            # sound1.play()
+
+                            # update start time
+                            secundomer.start = time_start
                             self.greeting = False
                             self.get_ready = True
 
@@ -537,16 +578,14 @@ class Game:
             # text typing
             elif self.tapping_start:
                 self.text_input.update(events)
-                # Screen updates
+
+                # screen updates
                 self.screen.fill(self.BG_COLOR)
                 head_rect_color(color_bg_mix(self.text_input.counter))
 
-                secundomer = Secundomer(
-                    y=int(round(scope_base * .13)),
-                    delay=TIME_DELAY,
-                    start=time_start,
-                    color=color_text_mix(self.text_input.counter)
-                )
+                # update secundomer
+                secundomer.color = color_text_mix(self.text_input.counter)
+                secundomer.paused = self.text_input.paused
                 secundomer.run()
 
                 self.text_input.draw(self.screen)
